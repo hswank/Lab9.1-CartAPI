@@ -1,0 +1,9 @@
+package co.grandcircus.cartlab.Repositories;
+
+import org.springframework.data.mongodb.repository.MongoRepository;
+
+import co.grandcircus.cartlab.Models.Cart;
+
+public interface CartRepository extends MongoRepository<Cart, String>{
+	
+}

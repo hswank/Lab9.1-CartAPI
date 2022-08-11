@@ -1,0 +1,47 @@
+package co.grandcircus.cartlab.Controllers;
+
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.*;
+
+import co.grandcircus.cartlab.Models.Cart;
+import co.grandcircus.cartlab.Repositories.CartRepository;
+
+@RestController
+public class CartController {
+	
+	@Autowired
+	private CartRepository cart_repo;
+	
+	@GetMapping("/reset")
+	public String reset() {
+		
+		// Delete all
+		cart_repo.deleteAll();
+		
+        Cart cart = new Cart("Ramen", .30, 10);
+        cart_repo.insert(cart);
+        cart = new Cart("Cashews", 4.99, 2);
+        cart_repo.insert(cart);
+        cart = new Cart("Spinach", 1.90, 4);
+        cart_repo.insert(cart);
+        cart = new Cart("Sushi", 8.99, 1);
+        cart_repo.insert(cart);
+        return "Data reset";
+
+	}
+	
+	@GetMapping("/cart")
+	public List<Cart> readAll(@RequestParam(required=false) String product) {
+		if (product != null) {
+			return cart_repo.findByProduct(product);
+		} else {
+			return cart_repo.findAll();
+		}
+	}
+	
+	@PostMapping("/cart")
+	
+	
+}

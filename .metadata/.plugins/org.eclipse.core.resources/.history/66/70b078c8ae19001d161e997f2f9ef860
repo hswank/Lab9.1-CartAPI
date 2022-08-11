@@ -1,0 +1,2 @@
+spring.data.mongodb.uri=mongodb+srv://admin:j39SnoDiEms7fN20@cluster0.end8n.mongodb.net/my_database
+spring.data.mongodb.database=my_database

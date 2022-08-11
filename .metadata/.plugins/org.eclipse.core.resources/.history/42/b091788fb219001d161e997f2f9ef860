@@ -1,0 +1,6 @@
+package co.grandcircus.cartlab.Models;
+
+@Document("cartItems")
+public class Cart {
+
+}

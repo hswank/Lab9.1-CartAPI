@@ -1,0 +1,14 @@
+package co.grandcircus.cartlab.Controllers;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.RestController;
+
+import co.grandcircus.cartlab.Repositories.CartRepository;
+
+@RestController
+public class HomeController {
+	
+	@Autowired
+	private CartRepository cart_repo;
+	
+}
