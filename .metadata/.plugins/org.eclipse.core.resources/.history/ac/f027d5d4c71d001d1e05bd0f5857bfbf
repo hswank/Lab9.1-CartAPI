@@ -1,0 +1,71 @@
+package co.grandcircus.cartlab.Controllers;
+
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.crossstore.ChangeSetPersister.NotFoundException;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.*;
+import co.grandcircus.cartlab.*;
+
+import co.grandcircus.cartlab.Models.Cart;
+import co.grandcircus.cartlab.Repositories.CartRepository;
+
+@RestController
+public class CartController {
+	
+	@Autowired
+	private CartRepository cart_repo;
+	
+	@GetMapping("/reset")
+	public String reset() {
+		
+		// Delete all
+		cart_repo.deleteAll();
+		
+        Cart cart = new Cart("Ramen", .30, 10);
+        cart_repo.insert(cart);
+        cart = new Cart("Cashews", 4.99, 2);
+        cart_repo.insert(cart);
+        cart = new Cart("Spinach", 1.90, 4);
+        cart_repo.insert(cart);
+        cart = new Cart("Sushi", 8.99, 1);
+        cart_repo.insert(cart);
+        return "Data reset";
+
+	}
+	
+	@GetMapping("/cart-items")
+	public List<Cart> readAll() {
+		return cart_repo.findAll();
+	}
+	
+	@GetMapping("/cart-items/{id}")
+	public Cart readOne(@PathVariable String id) {
+		return cart_repo.findById(id).orElseThrow(() -> new ProductNotFoundException(id));
+	}
+	
+	@PostMapping("/cart-items")
+	public Cart create(@RequestBody Cart cartItem) {
+		cart_repo.insert(cartItem);
+		return cartItem;
+	}
+	
+	@DeleteMapping("/cart-items/{id}")
+	@ResponseStatus(HttpStatus.NO_CONTENT)
+	public void delete(@PathVariable("id") String id) {
+		cart_repo.deleteById(id);
+	}
+	
+	@PutMapping("/cart-items/{id}")
+	public Cart update(@RequestBody Cart cartItem, @PathVariable("id") String id) {
+		cartItem.setId(id);
+		return cart_repo.save(cartItem);
+	}
+	
+	@ResponseBody
+	@ExceptionHandler(ProductNotFoundException.class)
+	@ResponseStatus(HttpStatus.NOT_FOUND) String productNotFoundHandler(ProductNotFoundException ex) {
+		return ex.getMessage();
+	}
+}

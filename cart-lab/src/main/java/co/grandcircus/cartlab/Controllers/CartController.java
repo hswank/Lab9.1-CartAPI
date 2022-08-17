@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.crossstore.ChangeSetPersister.NotFoundException;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import co.grandcircus.cartlab.*;
 
@@ -44,10 +45,47 @@ public class CartController {
 		return cart_repo.findById(id).orElseThrow(() -> new ProductNotFoundException(id));
 	}
 	
-	@PostMapping("/cartItem")
+	@PostMapping("/cart-items")
 	public Cart create(@RequestBody Cart cartItem) {
 		cart_repo.insert(cartItem);
 		return cartItem;
 	}
 	
+	@DeleteMapping("/cart-items/{id}")
+	@ResponseStatus(HttpStatus.NO_CONTENT)
+	public void delete(@PathVariable("id") String id) {
+		cart_repo.deleteById(id);
+	}
+	
+	@PutMapping("/cart-items/{id}")
+	public Cart update(@RequestBody Cart cartItem, @PathVariable("id") String id) {
+		cartItem.setId(id);
+		return cart_repo.save(cartItem);
+	}
+	
+	@ResponseBody
+	@ExceptionHandler(ProductNotFoundException.class)
+	@ResponseStatus(HttpStatus.NOT_FOUND) String productNotFoundHandler(ProductNotFoundException ex) {
+		return ex.getMessage();
+	}
+	
+	@GetMapping("/cart-items/total-cost")
+	public double totalCost() {
+		List<Cart> cartItems = cart_repo.findAll();
+		double cartTotal = 0;
+		for (Cart item: cartItems) {
+			double itemTotal = item.getPrice() * item.getQuantity();
+			cartTotal += itemTotal;
+		}
+		cartTotal *= 1.06;
+		return cartTotal;
+	}
+	
+	@PatchMapping("/cart-items/{id}/add")
+	public Cart updateQuantity(@RequestParam int count, @PathVariable("id") String id) {
+		Cart item = cart_repo.findById(id).orElseThrow(() -> new ProductNotFoundException(id));
+		item.setQuantity(item.getQuantity() + count);
+		cart_repo.save(item);
+		return item;
+	}
 }
